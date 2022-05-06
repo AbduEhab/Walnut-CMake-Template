@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.16)
 project(Walnut-CMake VERSION 0.2.0 LANGUAGES CXX)
 
 #----------------------------------------------------------------------------------------------
-# Part till line 29 is similar to that of @codetechandtutorials
+# Part till line 25 is very very similar to that of @codetechandtutorials
 
 #           DOWNLOAD ALL THE SUBMODULES
 find_package(Git QUIET)
@@ -14,11 +14,7 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     option(GIT_SUBMODULE "Check submodules during build" ON)
     if(GIT_SUBMODULE)
         message(STATUS "Submodule update")
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
-
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule foreach git pull
+        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote --merge
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                         RESULT_VARIABLE GIT_SUBMOD_RESULT)
 
