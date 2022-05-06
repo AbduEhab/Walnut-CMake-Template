@@ -105,15 +105,31 @@ list(APPEND WALNUT_CMAKE_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/EntryPoint.h"
 )
 
-message(STATUS ${WALNUT_CMAKE_HEADERS})
+list(APPEND IMGUI_HEADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imgui.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imconfig.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imgui_internal.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imstb_rectpack.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imstb_truetype.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imstb_textedit.h"
+)
 
 add_custom_target(build-time-make-directory ALL
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${WALNUT_CMAKE_INCLUDE_DIRS}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut/vendor/imgui
 )
 
 add_custom_command(
           TARGET ${PROJECT_NAME} PRE_BUILD
           COMMAND ${CMAKE_COMMAND} -E copy
           ${WALNUT_CMAKE_HEADERS}
-          ${WALNUT_CMAKE_INCLUDE_DIRS}
+          ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut
 )
+
+add_custom_command(
+          TARGET ${PROJECT_NAME} PRE_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy
+          ${IMGUI_HEADERS}
+          ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut/vendor/imgui
+)
+
