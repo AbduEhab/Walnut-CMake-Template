@@ -107,6 +107,10 @@ list(APPEND WALNUT_CMAKE_HEADERS
 
 message(STATUS ${WALNUT_CMAKE_HEADERS})
 
+add_custom_target(build-time-make-directory ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${WALNUT_CMAKE_INCLUDE_DIRS}
+)
+
 add_custom_command(
           TARGET ${PROJECT_NAME} PRE_BUILD
           COMMAND ${CMAKE_COMMAND} -E copy
