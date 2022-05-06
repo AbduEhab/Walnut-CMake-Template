@@ -4,3 +4,6 @@
 [submodule "external/glfw"]
 	path = external/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "external/imgui-cmake"]
+	path = external/imgui-cmake
+	url = https://github.com/tamaskenez/imgui-cmake.git

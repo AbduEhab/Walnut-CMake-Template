@@ -6,18 +6,21 @@ project(Walnut-CMake VERSION 0.2.0 LANGUAGES CXX)
 # Part till line 23 is very very similar to that of @codetechandtutorials
 
 #           DOWNLOAD ALL THE SUBMODULES
-find_package(Git QUIET)
-if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
-# Update submodules as needed
-    option(GIT_SUBMODULE "Check submodules during build" ON)
-    if(GIT_SUBMODULE)
-        message(STATUS "Submodule update")
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote --merge
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
 
-        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-            message(FATAL_ERROR "git submodule update --init --recursive --remote --merge failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+if (0)
+    find_package(Git QUIET)
+    if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+    # Update submodules as needed
+        option(GIT_SUBMODULE "Check submodules during build" ON)
+        if(GIT_SUBMODULE)
+            message(STATUS "Submodule update")
+            execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote --merge
+                            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                            RESULT_VARIABLE GIT_SUBMOD_RESULT)
+
+            if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+                message(FATAL_ERROR "git submodule update --init --recursive --remote --merge failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+            endif()
         endif()
     endif()
 endif()
@@ -47,6 +50,10 @@ add_subdirectory(
 # The glfw submodule that is included in the Walnut project is not compatible with CMake for some reason
 add_subdirectory(
     external/glfw
+)
+
+add_subdirectory(
+    external/imgui-cmake
 )
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -93,42 +100,42 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 
-set(WALNUT_CMAKE_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE STRING "Output directory")
+# set(WALNUT_CMAKE_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE STRING "Output directory")
 
-set(WALNUT_CMAKE_INCLUDE_DIRS "${WALNUT_CMAKE_OUT_DIR}/include")
+# set(WALNUT_CMAKE_INCLUDE_DIRS "${WALNUT_CMAKE_OUT_DIR}/include")
 
-list(APPEND WALNUT_CMAKE_HEADERS
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Application.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Image.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Random.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Layer.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/EntryPoint.h"
-)
+# list(APPEND WALNUT_CMAKE_HEADERS
+#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Application.h"
+#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Image.h"
+#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Random.h"
+#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Layer.h"
+#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/EntryPoint.h"
+# )
 
-list(APPEND IMGUI_HEADERS
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imgui.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imconfig.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imgui_internal.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imstb_rectpack.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imstb_truetype.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imstb_textedit.h"
-)
+# list(APPEND IMGUI_HEADERS
+#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imgui.h"
+#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imconfig.h"
+#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imgui_internal.h"
+#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imstb_rectpack.h"
+#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imstb_truetype.h"
+#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imstb_textedit.h"
+# )
 
-add_custom_target(build-time-make-directory ALL
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut
-)
+# add_custom_target(build-time-make-directory ALL
+#     COMMAND ${CMAKE_COMMAND} -E make_directory ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut
+# )
 
-add_custom_command(
-          TARGET ${PROJECT_NAME} PRE_BUILD
-          COMMAND ${CMAKE_COMMAND} -E copy
-          ${WALNUT_CMAKE_HEADERS}
-          ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut
-)
+# add_custom_command(
+#           TARGET ${PROJECT_NAME} PRE_BUILD
+#           COMMAND ${CMAKE_COMMAND} -E copy
+#           ${WALNUT_CMAKE_HEADERS}
+#           ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut
+# )
 
-add_custom_command(
-          TARGET ${PROJECT_NAME} PRE_BUILD
-          COMMAND ${CMAKE_COMMAND} -E copy
-          ${IMGUI_HEADERS}
-          ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut
-)
+# add_custom_command(
+#           TARGET ${PROJECT_NAME} PRE_BUILD
+#           COMMAND ${CMAKE_COMMAND} -E copy
+#           ${IMGUI_HEADERS}
+#           ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut
+# )
 

@@ -1,0 +1,10 @@
+#include "../external/Walnut/vendor/imgui/imgui.cpp"
+#include "../external/Walnut/vendor/imgui/imgui_demo.cpp"
+#include "../external/Walnut/vendor/imgui/imgui_draw.cpp"
+#include "../external/Walnut/vendor/imgui/imgui_tables.cpp"
+#include "../external/Walnut/vendor/imgui/imgui_widgets.cpp"
+
+#include "../external/Walnut/Walnut/src/Walnut/Application.cpp"
+#include "../external/Walnut/Walnut/src/Walnut/ImGui/ImGuiBuild.cpp"
+#include "../external/Walnut/Walnut/src/Walnut/Image.cpp"
+#include "../external/Walnut/Walnut/src/Walnut/Random.cpp"
