@@ -1,11 +1,9 @@
-# Set CMake version number
 cmake_minimum_required(VERSION 3.16)
 
-# Change "Temp-Projekt" to your project name
 project(Walnut-CMake VERSION 0.2.0 LANGUAGES CXX)
 
 #----------------------------------------------------------------------------------------------
-# Part till line 25 is very very similar to that of @codetechandtutorials
+# Part till line 23 is very very similar to that of @codetechandtutorials
 
 #           DOWNLOAD ALL THE SUBMODULES
 find_package(Git QUIET)
@@ -46,19 +44,18 @@ add_subdirectory(
     external/Walnut/vendor/glm
 )
 
-# The glfw that is included in the Walnut project is not compatible with CMake for some reason
+# The glfw submodule that is included in the Walnut project is not compatible with CMake for some reason
 add_subdirectory(
     external/glfw
 )
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# same standard that The Cherno uses
+# The same standard that The Cherno uses
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 
 # Defining WL_PLATFORM_WINDOWS WL_DEBUG where applicable
-
 if(MSVC)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG; WL_PLATFORM_WINDOWS; WL_DEBUG>
@@ -75,27 +72,44 @@ else()
     )
 endif()
 
-# <-- Added directories to include directory here: -->
 target_include_directories(${PROJECT_NAME}
     PUBLIC external/glfw/include
     PUBLIC external/Walnut/vendor/glm
     PUBLIC external/Walnut/vendor/imgui
     PUBLIC external/Walnut/vendor/stb_image
-    PUBLIC external/Walnut/Walnut/src
+    PUBLIC external/Walnut/Walnut/src/Walnut
     PUBLIC $ENV{VULKAN_SDK}/include
 )
 
-
-# <-- Added directory of external libs to link here: -->
 target_link_directories(${PROJECT_NAME}
     PRIVATE external/glfw/src
 )
 
 find_package(Vulkan REQUIRED)
 
-# <-- Link needed Libs: -->
 target_link_libraries(${PROJECT_NAME}
     Vulkan::Vulkan 
     glfw
 )
-# <----------------------->
+
+
+set(WALNUT_CMAKE_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE STRING "Output directory")
+
+set(WALNUT_CMAKE_INCLUDE_DIRS "${WALNUT_CMAKE_OUT_DIR}/include")
+
+list(APPEND WALNUT_CMAKE_HEADERS
+    "${CMAKE_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Application.h"
+    "${CMAKE_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Image.h"
+    "${CMAKE_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Random.h"
+    "${CMAKE_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Layer.h"
+    "${CMAKE_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/EntryPoint.h"
+)
+
+message(STATUS ${WALNUT_CMAKE_HEADERS})
+
+add_custom_command(
+          TARGET ${PROJECT_NAME} PRE_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy
+          ${WALNUT_CMAKE_HEADERS}
+          ${WALNUT_CMAKE_INCLUDE_DIRS}
+)
