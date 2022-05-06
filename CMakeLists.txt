@@ -116,7 +116,6 @@ list(APPEND IMGUI_HEADERS
 
 add_custom_target(build-time-make-directory ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut/vendor/imgui
 )
 
 add_custom_command(
@@ -130,6 +129,6 @@ add_custom_command(
           TARGET ${PROJECT_NAME} PRE_BUILD
           COMMAND ${CMAKE_COMMAND} -E copy
           ${IMGUI_HEADERS}
-          ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut/vendor/imgui
+          ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut
 )
 
