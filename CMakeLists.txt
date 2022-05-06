@@ -2,53 +2,10 @@
 cmake_minimum_required(VERSION 3.16)
 
 # Change "Temp-Projekt" to your project name
-project(Temp-Projekt VERSION 0.2.0 LANGUAGES CXX)
+project(Walnut-CMake VERSION 0.2.0 LANGUAGES CXX)
 
 #----------------------------------------------------------------------------------------------
-# Part till line 46 is taken from @lefticus
-
-# set a default CXX standard used by the external tools like clang-tidy, cppcheck, etc.
-# You can later set fine-grained standards for each target using `target_compile_features`
-set(CMAKE_CXX_STANDARD 17)
-
-### Add project_options
-# include(FetchContent)
-# FetchContent_Declare(_project_options URL https://github.com/cpp-best-practices/project_options/archive/refs/heads/main.zip)
-# FetchContent_MakeAvailable(_project_options)
-# include(${_project_options_SOURCE_DIR}/Index.cmake)
-include(CMakeSetupFiles/Index.cmake)
-
-# run_vcpkg()
-
-# Initialize project_options
-# uncomment the options to enable them
-project_options(
-#   ENABLE_CACHE
-#   ENABLE_CONAN
-  WARNINGS_AS_ERRORS
-#   ENABLE_CPPCHECK
-#   ENABLE_CLANG_TIDY
-#   ENABLE_INCLUDE_WHAT_YOU_USE
-#   ENABLE_COVERAGE
-#   ENABLE_PCH
-#   PCH_HEADERS <Eigen/Dense> <fmt/core.h> <vector> <utility> <string> <string_view>
-#   ENABLE_DOXYGEN
-#   ENABLE_IPO
-#   ENABLE_USER_LINKER
-#   ENABLE_BUILD_WITH_TIME_TRACE
-#   ENABLE_UNITY
-#   ENABLE_SANITIZER_ADDRESS
-#   ENABLE_SANITIZER_LEAK
-#   ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
-#   ENABLE_SANITIZER_THREAD
-#   ENABLE_SANITIZER_MEMORY
-  CLANG_WARNINGS "-Weverything"
-)
-
-#----------------------------------------------------------------------------------------------
-
-#----------------------------------------------------------------------------------------------
-# Part till line 67 is taken from @codetechandtutorials
+# Part till line 24 is taken from @codetechandtutorials
 
 #           DOWNLOAD ALL THE SUBMODULES
 find_package(Git QUIET)
@@ -68,54 +25,76 @@ endif()
 
 #----------------------------------------------------------------------------------------------
 
-# Add locations of other CMakelists.txt (one per call)
-add_subdirectory(
-    src
+# adding all files needed to compile the project
+add_library(${PROJECT_NAME}
+
+    external/Walnut/Walnut/src/Walnut/Application.cpp
+    external/Walnut/Walnut/src/Walnut/Image.cpp
+    external/Walnut/Walnut/src/Walnut/Random.cpp
+    external/Walnut/Walnut/src/Walnut/ImGui/ImGuiBuild.cpp
+
+    external/Walnut/vendor/imgui/imgui_draw.cpp
+    external/Walnut/vendor/imgui/imgui_demo.cpp
+    external/Walnut/vendor/imgui/imgui_tables.cpp
+    external/Walnut/vendor/imgui/imgui_widgets.cpp
+    external/Walnut/vendor/imgui/imgui.cpp
+
 )
 
-# Comment these 2 out if you don't intend on using CTests
-include(CTest)
-enable_testing()
+add_subdirectory(
+    external/Walnut/vendor/glm
+)
 
-# Extra C++ specific option I need
+# The glfw that is included in the Walnut project is not compatible with CMake for some reason
+add_subdirectory(
+    external/glfw
+)
+
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# <-- Set standard here -->
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
-# <----------------------->
+# same standard that The Cherno uses
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
-# <-- Define warnings to show -->
-target_link_libraries(${PROJECT_NAME} PRIVATE project_options project_warnings)
-# <----------------------->
 
-# <-- Comment out if you don't need CPack -->
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
-# <----------------------------------------->
+# Defining WL_PLATFORM_WINDOWS WL_DEBUG where applicable
 
-# <-- Define Compile Time Definitions here: -->
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-     $<$<CONFIG:Debug>:DEBUG=1>
-     $<$<CONFIG:RelWithDebInfo>:DEBUG=1>
-     $<$<CONFIG:Release>:NDEBUG=1>
-     $<$<CONFIG:MinSizeRel>:NDEBUG=1>
-)
-# <------------------------------------------->
+if(MSVC)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        $<$<CONFIG:Debug>:DEBUG; WL_PLATFORM_WINDOWS; WL_DEBUG>
+        $<$<CONFIG:RelWithDebInfo>:DEBUG; WL_PLATFORM_WINDOWS; WL_DEBUG>
+        $<$<CONFIG:Release>:NDEBUG; WL_PLATFORM_WINDOWS>
+        $<$<CONFIG:MinSizeRel>:NDEBUG; WL_PLATFORM_WINDOWS>
+    )
+else()
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        $<$<CONFIG:Debug>:DEBUG; WL_DEBUG>
+        $<$<CONFIG:RelWithDebInfo>:DEBUG; WL_DEBUG>
+        $<$<CONFIG:Release>:NDEBUG>
+        $<$<CONFIG:MinSizeRel>:NDEBUG>
+    )
+endif()
 
-# <-- Add directories to include directory here: -->
+# <-- Added directories to include directory here: -->
 target_include_directories(${PROJECT_NAME}
-    PUBLIC src
-    PUBLIC include
+    PUBLIC external/glfw/include
+    PUBLIC external/Walnut/vendor/glm
+    PUBLIC external/Walnut/vendor/imgui
+    PUBLIC external/Walnut/vendor/stb_image
+    PUBLIC external/Walnut/Walnut/src
+    PUBLIC $ENV{VULKAN_SDK}/include
 )
-# <------------------------------------------------>
 
-# <-- Add directory of external libs to link here: -->
+
+# <-- Added directory of external libs to link here: -->
 target_link_directories(${PROJECT_NAME}
-     PRIVATE src # this line is just to prevent errors
+    PRIVATE external/glfw/src
 )
-# <-------------------------------------------------->
+
+find_package(Vulkan REQUIRED)
 
 # <-- Link needed Libs: -->
-# target_link_libraries(${PROJECT_NAME} "LIB NAME")
+target_link_libraries(${PROJECT_NAME}
+    Vulkan::Vulkan 
+    glfw
+)
 # <----------------------->

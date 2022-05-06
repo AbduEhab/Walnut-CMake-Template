@@ -1,0 +1,6 @@
+[submodule "external/Walnut"]
+	path = external/Walnut
+	url = https://github.com/TheCherno/Walnut.git
+[submodule "external/glfw"]
+	path = external/glfw
+	url = https://github.com/glfw/glfw.git
