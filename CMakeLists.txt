@@ -1,47 +1,91 @@
+# Set CMake version number
 cmake_minimum_required(VERSION 3.16)
 
+# Change "Walnut-CMake" to your project name
 project(Walnut-CMake VERSION 0.2.0 LANGUAGES CXX)
 
 #----------------------------------------------------------------------------------------------
-# Part till line 23 is very very similar to that of @codetechandtutorials
+# Part till line 46 is taken from @lefticus
+
+# set a default CXX standard used by the external tools like clang-tidy, cppcheck, etc.
+# You can later set fine-grained standards for each target using `target_compile_features`
+set(CMAKE_CXX_STANDARD 20)
+
+### Add project_options
+# include(FetchContent)
+# FetchContent_Declare(_project_options URL https://github.com/cpp-best-practices/project_options/archive/refs/heads/main.zip)
+# FetchContent_MakeAvailable(_project_options)
+# include(${_project_options_SOURCE_DIR}/Index.cmake)
+include(CMakeSetupFiles/Index.cmake)
+
+# run_vcpkg()
+
+# Initialize project_options
+# uncomment the options to enable them
+project_options(
+#   ENABLE_CACHE
+#   ENABLE_CONAN
+  WARNINGS_AS_ERRORS
+#   ENABLE_CPPCHECK
+#   ENABLE_CLANG_TIDY
+#   ENABLE_INCLUDE_WHAT_YOU_USE
+#   ENABLE_COVERAGE
+#   ENABLE_PCH
+#   PCH_HEADERS <Eigen/Dense> <fmt/core.h> <vector> <utility> <string> <string_view>
+#   ENABLE_DOXYGEN
+#   ENABLE_IPO
+#   ENABLE_USER_LINKER
+#   ENABLE_BUILD_WITH_TIME_TRACE
+#   ENABLE_UNITY
+#   ENABLE_SANITIZER_ADDRESS
+#   ENABLE_SANITIZER_LEAK
+#   ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
+#   ENABLE_SANITIZER_THREAD
+#   ENABLE_SANITIZER_MEMORY
+  CLANG_WARNINGS "-Weverything"
+)
+
+#----------------------------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------------------------
+# Part till line 74 is very very similar to that of @codetechandtutorials
 
 #           DOWNLOAD ALL THE SUBMODULES
 
-if (0)
-    find_package(Git QUIET)
-    if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
-    # Update submodules as needed
-        option(GIT_SUBMODULE "Check submodules during build" ON)
-        if(GIT_SUBMODULE)
-            message(STATUS "Submodule update")
-            execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote --merge
-                            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                            RESULT_VARIABLE GIT_SUBMOD_RESULT)
-
-            if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-                message(FATAL_ERROR "git submodule update --init --recursive --remote --merge failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
-            endif()
+find_package(Git QUIET)
+if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+# Update submodules as needed
+    option(GIT_SUBMODULE "Check submodules during build" ON)
+    if(GIT_SUBMODULE)
+        message(STATUS "Submodule update")
+        if (1)
+        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
+        else()
+        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote --merge
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
+        endif()
+        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+            message(FATAL_ERROR "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
         endif()
     endif()
 endif()
 
 #----------------------------------------------------------------------------------------------
 
-# adding all files needed to compile the project
-add_library(${PROJECT_NAME}
 
-    external/Walnut/Walnut/src/Walnut/Application.cpp
-    external/Walnut/Walnut/src/Walnut/Image.cpp
-    external/Walnut/Walnut/src/Walnut/Random.cpp
-    external/Walnut/Walnut/src/Walnut/ImGui/ImGuiBuild.cpp
 
-    external/Walnut/vendor/imgui/imgui_draw.cpp
-    external/Walnut/vendor/imgui/imgui_demo.cpp
-    external/Walnut/vendor/imgui/imgui_tables.cpp
-    external/Walnut/vendor/imgui/imgui_widgets.cpp
-    external/Walnut/vendor/imgui/imgui.cpp
-
+# Add locations of other CMakelists.txt (one per call)
+add_subdirectory(
+    src
 )
+
+# Comment these 2 out if you don't intend on using CTests
+include(CTest)
+enable_testing()
+
 
 add_subdirectory(
     external/Walnut/vendor/glm
@@ -52,15 +96,18 @@ add_subdirectory(
     external/glfw
 )
 
-add_subdirectory(
-    external/imgui-cmake
-)
-
+# Extra C++ specific option I need
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# The same standard that The Cherno uses
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+# <-- Set standard here -->
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
+# <----------------------->
 
+# <-- Comment out if you don't need CPack -->
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+include(CPack)
+# <----------------------------------------->
 
 # Defining WL_PLATFORM_WINDOWS WL_DEBUG where applicable
 if(MSVC)
@@ -79,63 +126,28 @@ else()
     )
 endif()
 
+# <-- Add directories to include directory here: -->
 target_include_directories(${PROJECT_NAME}
+    PUBLIC include
     PUBLIC external/glfw/include
     PUBLIC external/Walnut/vendor/glm
     PUBLIC external/Walnut/vendor/imgui
     PUBLIC external/Walnut/vendor/stb_image
-    PUBLIC external/Walnut/Walnut/src/Walnut
+    PUBLIC external/Walnut/Walnut/src
     PUBLIC $ENV{VULKAN_SDK}/include
+    PUBLIC ${Vulkan_INCLUDE_DIRS}
 )
+# <------------------------------------------------>
 
+# <-- Added directory of external libs to link here: -->
 target_link_directories(${PROJECT_NAME}
     PRIVATE external/glfw/src
 )
 
 find_package(Vulkan REQUIRED)
 
+# <-- Link needed Libs: -->
 target_link_libraries(${PROJECT_NAME}
-    Vulkan::Vulkan 
-    glfw
+    glfw Vulkan::Vulkan ${VULKAN_LIB_LIST} ${Vulkan_LIBRARY}
 )
-
-
-# set(WALNUT_CMAKE_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE STRING "Output directory")
-
-# set(WALNUT_CMAKE_INCLUDE_DIRS "${WALNUT_CMAKE_OUT_DIR}/include")
-
-# list(APPEND WALNUT_CMAKE_HEADERS
-#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Application.h"
-#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Image.h"
-#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Random.h"
-#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Layer.h"
-#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/EntryPoint.h"
-# )
-
-# list(APPEND IMGUI_HEADERS
-#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imgui.h"
-#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imconfig.h"
-#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imgui_internal.h"
-#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imstb_rectpack.h"
-#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imstb_truetype.h"
-#     "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/vendor/imgui/imstb_textedit.h"
-# )
-
-# add_custom_target(build-time-make-directory ALL
-#     COMMAND ${CMAKE_COMMAND} -E make_directory ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut
-# )
-
-# add_custom_command(
-#           TARGET ${PROJECT_NAME} PRE_BUILD
-#           COMMAND ${CMAKE_COMMAND} -E copy
-#           ${WALNUT_CMAKE_HEADERS}
-#           ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut
-# )
-
-# add_custom_command(
-#           TARGET ${PROJECT_NAME} PRE_BUILD
-#           COMMAND ${CMAKE_COMMAND} -E copy
-#           ${IMGUI_HEADERS}
-#           ${WALNUT_CMAKE_INCLUDE_DIRS}/Walnut
-# )
-
+# <----------------------->
