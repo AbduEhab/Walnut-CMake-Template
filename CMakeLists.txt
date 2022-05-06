@@ -98,11 +98,11 @@ set(WALNUT_CMAKE_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE STRING "Output dire
 set(WALNUT_CMAKE_INCLUDE_DIRS "${WALNUT_CMAKE_OUT_DIR}/include")
 
 list(APPEND WALNUT_CMAKE_HEADERS
-    "${CMAKE_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Application.h"
-    "${CMAKE_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Image.h"
-    "${CMAKE_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Random.h"
-    "${CMAKE_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Layer.h"
-    "${CMAKE_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/EntryPoint.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Application.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Image.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Random.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/Layer.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/Walnut/Walnut/src/Walnut/EntryPoint.h"
 )
 
 message(STATUS ${WALNUT_CMAKE_HEADERS})
