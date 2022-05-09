@@ -1,11 +1,9 @@
-# Set CMake version number
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.13)
 
-# Change "Walnut-CMake" to your project name
-project(Walnut-CMake VERSION 0.2.0 LANGUAGES CXX)
+project(Cpp_RayTracer VERSION 0.2.0)
 
 #----------------------------------------------------------------------------------------------
-# Part till line 46 is taken from @lefticus
+# Part till line 44 is taken from @lefticus
 
 # set a default CXX standard used by the external tools like clang-tidy, cppcheck, etc.
 # You can later set fine-grained standards for each target using `target_compile_features`
@@ -25,7 +23,7 @@ include(CMakeSetupFiles/Index.cmake)
 project_options(
 #   ENABLE_CACHE
 #   ENABLE_CONAN
-  WARNINGS_AS_ERRORS
+#   WARNINGS_AS_ERRORS
 #   ENABLE_CPPCHECK
 #   ENABLE_CLANG_TIDY
 #   ENABLE_INCLUDE_WHAT_YOU_USE
@@ -48,7 +46,7 @@ project_options(
 #----------------------------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------------------------
-# Part till line 74 is very very similar to that of @codetechandtutorials
+# Part till line 72 is very very similar to that of @codetechandtutorials
 
 #           DOWNLOAD ALL THE SUBMODULES
 
@@ -75,17 +73,15 @@ endif()
 
 #----------------------------------------------------------------------------------------------
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+      "Build not specified, defaulted to Debug" FORCE)
+    message(STATUS "Build type not specified, defaulted to Debug")
+endif(NOT CMAKE_BUILD_TYPE)
 
-
-# Add locations of other CMakelists.txt (one per call)
 add_subdirectory(
     src
 )
-
-# Comment these 2 out if you don't intend on using CTests
-include(CTest)
-enable_testing()
-
 
 add_subdirectory(
     external/Walnut/vendor/glm
@@ -99,30 +95,22 @@ add_subdirectory(
 # Extra C++ specific option I need
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# <-- Set standard here -->
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
-# <----------------------->
-
-# <-- Comment out if you don't need CPack -->
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
-# <----------------------------------------->
 
 # Defining WL_PLATFORM_WINDOWS WL_DEBUG where applicable
 if(MSVC)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG; WL_PLATFORM_WINDOWS; WL_DEBUG>
         $<$<CONFIG:RelWithDebInfo>:DEBUG; WL_PLATFORM_WINDOWS; WL_DEBUG>
-        $<$<CONFIG:Release>:NDEBUG; WL_PLATFORM_WINDOWS>
-        $<$<CONFIG:MinSizeRel>:NDEBUG; WL_PLATFORM_WINDOWS>
+        $<$<CONFIG:Release>:NDEBUG; WL_PLATFORM_WINDOWS; WL_DIST>
+        $<$<CONFIG:MinSizeRel>:NDEBUG; WL_PLATFORM_WINDOWS; WL_DIST>
     )
 else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG; WL_DEBUG>
         $<$<CONFIG:RelWithDebInfo>:DEBUG; WL_DEBUG>
-        $<$<CONFIG:Release>:NDEBUG>
-        $<$<CONFIG:MinSizeRel>:NDEBUG>
+        $<$<CONFIG:Release>:NDEBUG; WL_DIST>
+        $<$<CONFIG:MinSizeRel>:NDEBUG; WL_DIST>
     )
 endif()
 
@@ -148,6 +136,7 @@ find_package(Vulkan REQUIRED)
 
 # <-- Link needed Libs: -->
 target_link_libraries(${PROJECT_NAME}
-    glfw Vulkan::Vulkan ${VULKAN_LIB_LIST} ${Vulkan_LIBRARY}
+    PRIVATE project_options project_warnings
+    PUBLIC glfw Vulkan::Vulkan ${VULKAN_LIB_LIST} ${Vulkan_LIBRARY}
 )
 # <----------------------->
