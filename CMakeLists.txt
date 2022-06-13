@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(Cpp_RayTracer VERSION 0.2.0)
+project(Walnut-CMake VERSION 0.2.0)
 
 #----------------------------------------------------------------------------------------------
 # Part till line 44 is taken from @lefticus
