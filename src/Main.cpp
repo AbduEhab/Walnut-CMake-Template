@@ -1,5 +1,7 @@
 #include "Constants.h"
 
+#ifdef _WIN32
+
 #include "Walnut/Application.h"
 #include "Walnut/EntryPoint.h"
 
@@ -38,3 +40,12 @@ Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
 	});
 	return app;
 }
+
+#else
+
+int main(int, char **)
+{
+    print("GNU/Linux is not yet supported (but i'm looking into it).\n");
+}
+
+#endif
