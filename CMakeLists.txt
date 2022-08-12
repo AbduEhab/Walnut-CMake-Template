@@ -40,7 +40,7 @@ project_options(
 #   ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
 #   ENABLE_SANITIZER_THREAD
 #   ENABLE_SANITIZER_MEMORY
-  CLANG_WARNINGS "-Weverything"
+#  CLANG_WARNINGS "-Weverything"
 )
 
 #----------------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     option(GIT_SUBMODULE "Check submodules during build" ON)
     if(GIT_SUBMODULE)
         message(STATUS "Submodule update")
-        if (1)
+        if (0)
         execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                         RESULT_VARIABLE GIT_SUBMOD_RESULT)
