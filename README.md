@@ -4,5 +4,5 @@ This Repo is for those who want to use `The Cherno`'s library but would rather u
 
 # Requirements
 - [CMake](https://cmake.org/)
-- x64 Compiler (DOES NOT WORK WITH x86 COMPILERS!!! Currently only tested with [Visual Studio 17 Build Tools](https://visualstudio.microsoft.com/downloads/)) 
+- x64 Compiler (DOES NOT WORK WITH x86 COMPILERS!!!) (Currently only tested with [Visual Studio 17 Build Tools](https://visualstudio.microsoft.com/downloads/)) 
 - [Vulkan SDK](https://vulkan.lunarg.com/sdk/home#windows)
