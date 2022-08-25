@@ -1,15 +1,16 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(Walnut-CMake VERSION 0.2.0)
+project(Walnut-CMake VERSION 0.6.0 LANGUAGES CXX)
+enable_language(CXX)
 
-#----------------------------------------------------------------------------------------------
-# Part till line 44 is taken from @lefticus
+# ----------------------------------------------------------------------------------------------
+# Part till line 71 is taken from @lefticus
 
 # set a default CXX standard used by the external tools like clang-tidy, cppcheck, etc.
 # You can later set fine-grained standards for each target using `target_compile_features`
 set(CMAKE_CXX_STANDARD 20)
 
-### Add project_options
+# ## Add project_options
 # include(FetchContent)
 # FetchContent_Declare(_project_options URL https://github.com/cpp-best-practices/project_options/archive/refs/heads/main.zip)
 # FetchContent_MakeAvailable(_project_options)
@@ -20,67 +21,103 @@ include(CMakeSetupFiles/Index.cmake)
 
 # Initialize project_options
 # uncomment the options to enable them
-project_options(
-#   ENABLE_CACHE
-#   ENABLE_CONAN
-#   WARNINGS_AS_ERRORS
-#   ENABLE_CPPCHECK
-#   ENABLE_CLANG_TIDY
-#   ENABLE_INCLUDE_WHAT_YOU_USE
-#   ENABLE_COVERAGE
-#   ENABLE_PCH
-#   PCH_HEADERS <Eigen/Dense> <fmt/core.h> <vector> <utility> <string> <string_view>
-#   ENABLE_DOXYGEN
-#   ENABLE_IPO
-#   ENABLE_USER_LINKER
-#   ENABLE_BUILD_WITH_TIME_TRACE
-#   ENABLE_UNITY
-#   ENABLE_SANITIZER_ADDRESS
-#   ENABLE_SANITIZER_LEAK
-#   ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
-#   ENABLE_SANITIZER_THREAD
-#   ENABLE_SANITIZER_MEMORY
-#  CLANG_WARNINGS "-Weverything"
-)
+if(MSVC)
+    project_options(
 
-#----------------------------------------------------------------------------------------------
+        # ENABLE_CACHE
+        # ENABLE_CONAN
+        # WARNINGS_AS_ERRORS
+        # ENABLE_CPPCHECK
+        # ENABLE_CLANG_TIDY
+        # ENABLE_INCLUDE_WHAT_YOU_USE
+        # ENABLE_COVERAGE
+        # ENABLE_PCH
+        # PCH_HEADERS <Eigen/Dense> <fmt/core.h> <vector> <utility> <string> <string_view>
+        # ENABLE_DOXYGEN
+        # ENABLE_IPO
+        # ENABLE_USER_LINKER
+        # ENABLE_BUILD_WITH_TIME_TRACE
+        # ENABLE_UNITY
+        # ENABLE_SANITIZER_ADDRESS
+        # ENABLE_SANITIZER_LEAK
+        # ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
+        # ENABLE_SANITIZER_THREAD
+        # ENABLE_SANITIZER_MEMORY
+        CLANG_WARNINGS "-Weverything"
+    )
+else()
+    project_options(
 
-#----------------------------------------------------------------------------------------------
-# Part till line 72 is very very similar to that of @codetechandtutorials
+        # ENABLE_CACHE
+        # ENABLE_CONAN
+        # WARNINGS_AS_ERRORS
+        # ENABLE_CPPCHECK
+        # ENABLE_CLANG_TIDY
+        # ENABLE_INCLUDE_WHAT_YOU_USE
+        # ENABLE_COVERAGE
+        # ENABLE_PCH
+        # PCH_HEADERS <Eigen/Dense> <fmt/core.h> <vector> <utility> <string> <string_view>
+        # ENABLE_DOXYGEN
+        # ENABLE_IPO
+        # ENABLE_USER_LINKER
+        # ENABLE_BUILD_WITH_TIME_TRACE
+        # ENABLE_UNITY
+        # ENABLE_SANITIZER_ADDRESS
+        # ENABLE_SANITIZER_LEAK
+        # ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
+        # ENABLE_SANITIZER_THREAD
+        # ENABLE_SANITIZER_MEMORY
+    )
+endif()
 
-#           DOWNLOAD ALL THE SUBMODULES
+# ----------------------------------------------------------------------------------------------
 
+# ----------------------------------------------------------------------------------------------
+# Part till line 102 is very very similar to that of @codetechandtutorials
+
+# DOWNLOAD ALL THE SUBMODULES
 find_package(Git QUIET)
+
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
-# Update submodules as needed
+    # Update submodules as needed
     option(GIT_SUBMODULE "Check submodules during build" ON)
-    if(GIT_SUBMODULE)
+
+    if(GIT_SUBMODULE) # Check submodules during build (SET TO 0 TO AVOID UPDATING)
         message(STATUS "Submodule update")
-        if (0)
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
+
+        if(0)
+            execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                RESULT_VARIABLE GIT_SUBMOD_RESULT)
         else()
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote --merge
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
+            execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote --merge
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                RESULT_VARIABLE GIT_SUBMOD_RESULT)
         endif()
+
         if(NOT GIT_SUBMOD_RESULT EQUAL "0")
             message(FATAL_ERROR "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
         endif()
     endif()
 endif()
 
-#----------------------------------------------------------------------------------------------
-
+# ----------------------------------------------------------------------------------------------
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
-      "Build not specified, defaulted to Debug" FORCE)
-    message(STATUS "Build type not specified, defaulted to Debug")
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
+        "Build not specified, defaulted to RelWithDebInfo" FORCE)
+    message(STATUS "Build type not specified, defaulted to RelWithDebInfo")
 endif(NOT CMAKE_BUILD_TYPE)
 
 add_subdirectory(
     src
+)
+
+file(GLOB ImGui ${PROJECT_SOURCE_DIR}/external/Walnut/vendor/imgui/*.cpp)
+file(GLOB ImGui_headers ${PROJECT_SOURCE_DIR}/external/Walnut/vendor/imgui/*.h)
+
+add_library(ImGui
+    ${ImGui}
+    ${ImGui_headers}
 )
 
 add_subdirectory(
@@ -98,7 +135,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 # Defining WL_PLATFORM_WINDOWS WL_DEBUG where applicable
-if(MSVC)
+if(WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG; WL_PLATFORM_WINDOWS; WL_DEBUG>
         $<$<CONFIG:RelWithDebInfo>:DEBUG; WL_PLATFORM_WINDOWS; WL_DEBUG>
@@ -125,6 +162,7 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC $ENV{VULKAN_SDK}/include
     PUBLIC ${Vulkan_INCLUDE_DIRS}
 )
+
 # <------------------------------------------------>
 
 # <-- Added directory of external libs to link here: -->
@@ -132,11 +170,13 @@ target_link_directories(${PROJECT_NAME}
     PRIVATE external/glfw/src
 )
 
+# <----------------------->
 find_package(Vulkan REQUIRED)
 
 # <-- Link needed Libs: -->
 target_link_libraries(${PROJECT_NAME}
     PRIVATE project_options project_warnings
-    PUBLIC glfw Vulkan::Vulkan ${VULKAN_LIB_LIST} ${Vulkan_LIBRARY}
+    PUBLIC glfw Vulkan::Vulkan ${VULKAN_LIB_LIST} ${Vulkan_LIBRARY} ImGui
 )
+
 # <----------------------->

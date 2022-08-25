@@ -20,15 +20,15 @@ public:
 	}
 };
 
-Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
+Walnut::Application *Walnut::CreateApplication([[maybe_unused]] int argc, [[maybe_unused]] char **argv)
 {
 	Walnut::ApplicationSpecification spec;
 	spec.Name = "Walnut Example";
 
-	Walnut::Application* app = new Walnut::Application(spec);
+	Walnut::Application *app = new Walnut::Application(spec);
 	app->PushLayer<ExampleLayer>();
 	app->SetMenubarCallback([app]()
-	{
+							{
 		if (ImGui::BeginMenu("File"))
 		{
 			if (ImGui::MenuItem("Exit"))
@@ -36,8 +36,7 @@ Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
 				app->Close();
 			}
 			ImGui::EndMenu();
-		}
-	});
+		} });
 	return app;
 }
 
@@ -45,7 +44,7 @@ Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
 
 int main(int, char **)
 {
-    print("GNU/Linux is not yet supported (but i'm looking into it).\n");
+	print("GNU/Linux is not yet supported (but i'm looking into it).\n");
 }
 
 #endif
