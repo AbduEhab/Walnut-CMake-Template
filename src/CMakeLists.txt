@@ -41,13 +41,6 @@ endif()
 
 message(STATUS `$<CONFIG> = ${CMAKE_BUILD_TYPE}`)
 
-# Delete old files
-add_custom_command(
-     TARGET ${PROJECT_NAME} POST_BUILD
-     COMMAND ${CMAKE_COMMAND} -E remove_directory
-     ${CMAKE_SOURCE_DIR}/bin/${CMAKE_GENERATOR_PLATFORM} # Change this to your Prefered location (I prefer ${CMAKE_SOURCE_DIR}/bin/$<CONFIG>/ or ${CMAKE_SOURCE_DIR}/bin/$<CMAKE_GENERATOR_PLATFORM>/)
-)
-
 # Copy Binary to DEV specified location
 add_custom_command(
      TARGET ${PROJECT_NAME} POST_BUILD
