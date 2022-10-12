@@ -39,33 +39,27 @@ else()
      )
 endif()
 
-message(STATUS `CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}`)
+message(STATUS `$<CONFIG> = ${CMAKE_BUILD_TYPE}`)
 
-if(WIN32) # < - Windows Binary copy - >
-     if(MSVC)
-          # Copy Binary to DEV specified location
-          add_custom_command(
-               TARGET ${PROJECT_NAME} POST_BUILD
-               COMMAND ${CMAKE_COMMAND} -E copy
-               ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${PROJECT_NAME}.exe
-               ${CMAKE_SOURCE_DIR}/bin/
-          )
-     else()
-          add_custom_command(
-               TARGET ${PROJECT_NAME} POST_BUILD
-               COMMAND ${CMAKE_COMMAND} -E copy
-               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.exe
-               ${CMAKE_SOURCE_DIR}/bin/
-          )
-     endif()
+# Delete old files
+add_custom_command(
+     TARGET ${PROJECT_NAME} POST_BUILD
+     COMMAND ${CMAKE_COMMAND} -E remove_directory
+     ${CMAKE_SOURCE_DIR}/bin/${CMAKE_GENERATOR_PLATFORM} # Change this to your Prefered location (I prefer ${CMAKE_SOURCE_DIR}/bin/$<CONFIG>/ or ${CMAKE_SOURCE_DIR}/bin/$<CMAKE_GENERATOR_PLATFORM>/)
+)
 
-else() # < - UNIX Binary copy - >
-     add_custom_command(
-          TARGET ${PROJECT_NAME} POST_BUILD
-          COMMAND ${CMAKE_COMMAND} -E copy
-          ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}
-          ${CMAKE_SOURCE_DIR}/bin/
-     )
-endif()
+# Copy Binary to DEV specified location
+add_custom_command(
+     TARGET ${PROJECT_NAME} POST_BUILD
+     COMMAND ${CMAKE_COMMAND} -E copy_directory
+     $<TARGET_FILE_DIR:${PROJECT_NAME}>
+     ${CMAKE_SOURCE_DIR}/bin/${CMAKE_GENERATOR_PLATFORM} # Change this to your Prefered location (I prefer ${CMAKE_SOURCE_DIR}/bin/$<CONFIG>/ or ${CMAKE_SOURCE_DIR}/bin/$<CMAKE_GENERATOR_PLATFORM>/)
+)
 
+# add_custom_command(
+# TARGET ${PROJECT_NAME} POST_BUILD
+# COMMAND ${CMAKE_COMMAND} -E create_symlink ${link_src} ${link_dst}
+# DEPENDS ${link_dst}
+# COMMENT "symbolic link ${link_src} => ${link_dst}"
+# )
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

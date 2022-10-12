@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(Walnut-CMake VERSION 0.6.0 LANGUAGES CXX)
+project(Walnut-CMake VERSION 0.7.0 LANGUAGES CXX)
 enable_language(CXX)
 
 # ----------------------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     if(GIT_SUBMODULE) # Check submodules during build (SET TO 0 TO AVOID UPDATING)
         message(STATUS "Submodule update")
 
-        if(0)
+        if(1) # Update and/or upgrade submodules (SET TO 1 TO AVOID UPGRADING)
             execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                 RESULT_VARIABLE GIT_SUBMOD_RESULT)
@@ -134,7 +134,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
-# Defining WL_PLATFORM_WINDOWS WL_DEBUG where applicable
+# Defining WL_PLATFORM_WINDOWS and WL_DEBUG where applicable
 if(WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:DEBUG; WL_PLATFORM_WINDOWS; WL_DEBUG>
@@ -170,7 +170,8 @@ target_link_directories(${PROJECT_NAME}
     PRIVATE external/glfw/src
 )
 
-# <----------------------->
+# <---------------------------------------------------->
+
 find_package(Vulkan REQUIRED)
 
 # <-- Link needed Libs: -->

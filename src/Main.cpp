@@ -10,8 +10,10 @@
 class ExampleLayer : public Walnut::Layer
 {
 public:
-	virtual void OnUIRender() override
+	virtual void OnUIRender() override // Called every frame
 	{
+		PROFILE_FUNCTION();
+
 		ImGui::Begin("Hello");
 		ImGui::Button("Button");
 		ImGui::End();
@@ -22,11 +24,13 @@ public:
 
 Walnut::Application *Walnut::CreateApplication([[maybe_unused]] int argc, [[maybe_unused]] char **argv)
 {
-	Walnut::ApplicationSpecification spec;
-	spec.Name = "Walnut Example";
+	Instrumentor::Get().beginSession("Main func"); // Start profiling session
 
-	Walnut::Application *app = new Walnut::Application(spec);
-	app->PushLayer<ExampleLayer>();
+	Walnut::ApplicationSpecification spec; // Create application specification
+	spec.Name = "Walnut Example";		   // Set the name of the application
+
+	Walnut::Application *app = new Walnut::Application(spec); // Create the application
+	app->PushLayer<ExampleLayer>();							  // Push the layer to the application
 	app->SetMenubarCallback([app]()
 							{
 		if (ImGui::BeginMenu("File"))

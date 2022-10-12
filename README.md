@@ -6,3 +6,7 @@ This Repo is for those who want to use `The Cherno`'s library but would rather u
 - [CMake](https://cmake.org/)
 - x64 Compiler (DOES NOT WORK WITH x86 COMPILERS!!!) (Currently tested `only` with [Visual Studio 22 Build Tools](https://visualstudio.microsoft.com/downloads/))
 - [Vulkan SDK](https://vulkan.lunarg.com/sdk/home#windows)
+
+## Profiling
+
+You can use https://ui.perfetto.dev/ to view the profiling data. The data is stored in `profiling/` and is named `perfetto_trace.json`.
