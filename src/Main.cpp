@@ -1,4 +1,4 @@
-#include "Constants.h"
+#include "Constants.hpp"
 
 #ifdef _WIN32
 
@@ -25,6 +25,8 @@ public:
 Walnut::Application *Walnut::CreateApplication([[maybe_unused]] int argc, [[maybe_unused]] char **argv)
 {
 	Instrumentor::Get().beginSession("Main func"); // Start profiling session
+
+	TimedBlock block("Main func"); // Start timer block
 
 	Walnut::ApplicationSpecification spec; // Create application specification
 	spec.Name = "Walnut Example";		   // Set the name of the application
