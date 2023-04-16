@@ -2,7 +2,7 @@
 
 This Repo is for those who want to use `The Cherno`'s library but would rather use good old CMake (with maybe VS Code) than the full fat version of Visual Studio that he set up the project to use. 
 
-NOW SUPPORTS GCC (tested on windows only)
+> NOW SUPPORTS GCC!
 
 I'm looking into Linux compatibility.
 
